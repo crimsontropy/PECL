@@ -2,7 +2,13 @@
 ## Prettier EBCH Chatlogs by Haruhi #78366 [Download](https://github.com/crimsontropy/PECL/releases/download/Mver/PECL.exe)
 
 A quick and easy way to get some styling on [EBCH chatlogs](https://e2466.gitlab.io/ebch/).
-Thanks to Elicia #10831 for the logger of course~ 
+Thanks to Elicia #10831 for the logger! 
+<br><br>
+Sample Image:
+<br>
+<img src="https://cdn.discordapp.com/attachments/1034819975522828352/1059154395973025912/image.png" width="60%" height="60%">
+<!-- ![image1](https://cdn.discordapp.com/attachments/1034819975522828352/1059154395973025912/image.png =250x250) -->
+
 #
 
 ## How to use: 
