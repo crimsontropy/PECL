@@ -1,5 +1,5 @@
 # **PECL**
-## Prettier EBCH Chatlogs by Haruhi #78366 [Download]()
+## Prettier EBCH Chatlogs by Haruhi #78366 [Download](https://github.com/crimsontropy/PECL/releases/download/Mver/PECL.exe)
 
 A quick and easy way to get some styling on [EBCH chatlogs](https://e2466.gitlab.io/ebch/).
 
@@ -9,7 +9,7 @@ A quick and easy way to get some styling on [EBCH chatlogs](https://e2466.gitlab
 
 - ## The Standard Way (Windows only)
 
-1. [Download PECL.exe]().
+1. [Download PECL.exe](https://github.com/crimsontropy/PECL/releases/download/Mver/PECL.exe).
 2. Put the chatlog .html files in **input_chat** folder kept in the same directory as PECL.exe
 3. Run the .exe and get your output in **output_chat** folder.
 <br><br>
