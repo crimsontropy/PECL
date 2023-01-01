@@ -33,9 +33,9 @@ I am planning on making this work on the old format as well AND get the char_con
 #
 
 ## Advanced guide
-- You can change the randomly chosen color for each characters in **char_config.json** which is generated on first run of the program. Just search their Member Number and change the hex code. (I'm free for new ideas on how this could be better handled)
+- You can change the randomly chosen color for each characters in **char_config.json** which is generated on first run of the program. Just search their Member Number or Name and change the hex code. Run the program again to generate new html file with the modified colors. (I'm free for new ideas on how this could be better handled)
 <br>
 
 #
 
-### Report any issues with the program in the issues section  or [BC Scripting discord](https://discord.gg/SHJMjEh9VH).
+### Report any issues with the program in the issues section or [BC Scripting discord](https://discord.gg/SHJMjEh9VH).
