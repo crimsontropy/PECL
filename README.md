@@ -38,4 +38,4 @@ I am planning on making this work on the old format as well AND get the char_con
 
 #
 
-### Report any issues with the program in the issues section or [BC Scripting discord](https://discord.gg/SHJMjEh9VH).
+### Report any issues with the program in the issues section or [BC Scripting discord](https://discord.gg/SHJMjEh9VH) to @crimsonfox#9325.
