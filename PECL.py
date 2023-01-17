@@ -1,8 +1,12 @@
-import random
+# import random
 import json
 import os
 import sys
 from tqdm import tqdm
+from bs4 import BeautifulSoup as BSoup
+from bs4 import NavigableString
+from PECL_vars import beginhtml,endhtml,roomname_begin,roomname_mid,roomname_end
+from PECL_funcs import new_format_content_distributer,old_format_content_distributer,general_chat_detail_set
 
 print("\n========================== Prettier EBCH Chatlogs by Haruhi#78366 ==========================\n")
 
@@ -15,273 +19,37 @@ if not os.path.isdir("input_chat"):
 files = [f for f in os.listdir("input_chat") if os.path.isfile(os.path.join("input_chat", f))]
 print("Files found in input_chat: ",files,end="\n\n")
 
-beginhtml = """
-    <!DOCTYPE html>
-    <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <style>
-        canvas {
-            padding: 0;
-            margin: auto;
-            outline: none;
-            display: block;
-            top:0;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            position: absolute;
-            width: 100%;
-        }
-        @media (min-aspect-ratio: 2/1) {
-        canvas {
-            width: unset;
-            height: 100%;
-        }
-        }
-        input {
-            background: white;
-        }
-        textarea {
-            background: white;
-            resize: none;
-        }
-        * { -webkit-tap-highlight-color:rgba(0,0,0,0); }
-        #TextAreaChatLog {
-            background-color: white;
-            border: 1px solid black;
-            overflow: auto;
-            word-wrap: break-word;
-            padding: 0 !important;
-        }
-        .ChatMessage {
-            position: relative;
-            padding-left: 0.4em;
-            overflow: hidden;
-        }
-        .ChatMessage::before {
-            content: attr(data-time);
-            float: right;
-            color: gray;
-            font-style: italic;
-            font-size: 0.4em;
-            margin-right: 0.2em;
-        }
-        .ChatMessage::after {
-            content: attr(data-sender);
-            position: absolute;
-            color: gray;
-            font-size: 0.3em;
-            top: 1.6em;
-            right: 0.2em;
-        }
-        .ChatMessageName {
-            text-shadow: 0.05em 0.05em black;
-        }
-        .ChatMessageAction, .ChatMessageActivity{
-            color: gray;
-        }
-        .ChatMessageEmote {
-            color: gray;
-            font-style: italic;
-        }
-        .ChatMessageWhisper {
-            font-style: italic;
-            color: silver;
-        }
-        #TextAreaChatLog[data-shrinknondialogue=true] .ChatMessageEmote {
-            font-size: 0.75em;
-        }
-        #TextAreaChatLog[data-colortheme=dark], #TextAreaChatLog[data-colortheme="dark2"] {
-        background-color: #111;
-        color: #eee;
-        }
-        #TextAreaChatLog[data-colortheme=dark] .ChatMessageName {
-        text-shadow: 0.05em 0.05em #eee;
-        }
-        #TextAreaChatLog[data-colortheme=dark] .ChatMessageWhisper, #TextAreaChatLog[data-colortheme="dark2"] .ChatMessageWhisper {
-        color: #555;
-        }
+def save_html(finalhtml):
+    if not os.path.isdir("output_chat"):
+        print("Creating output_chat folder...")
+        os.mkdir("output_chat")
+    print("\nSaving converted file in output_chat...")
+    with open("output_chat\\-converted-"+file,"w") as createhtml:
+        createhtml.write(finalhtml)
+    print("Done!\n")
 
-        #TextAreaChatLog[data-colortheme="dark2"] .ChatMessage, #TextAreaChatLog[data-colortheme="light2"] .ChatMessage {
-        line-height: 1.4em;
-        padding: 0.1em;
-        padding-right: 2em;
-        }
-        #TextAreaChatLog[data-colortheme="light2"] .ChatMessage {
-        border-bottom: 1px solid rgba(0, 0, 0, 0.25);
-        }
-        #TextAreaChatLog[data-colortheme="dark2"] .ChatMessage {
-        border-bottom: 1px solid rgba(255, 255, 255, 0.4);
-        }
-        #TextAreaChatLog[data-colortheme="dark2"] .ChatMessageEmote,
-        #TextAreaChatLog[data-colortheme="dark2"] .ChatMessageAction,
-        #TextAreaChatLog[data-colortheme="dark2"] .ChatMessageActivity,
-        #TextAreaChatLog[data-colortheme="light2"] .ChatMessageEmote,
-        #TextAreaChatLog[data-colortheme="light2"] .ChatMessageAction,
-        #TextAreaChatLog[data-colortheme="light2"] .ChatMessageActivity {
-        font-size: 0.8em;
-        }
-        #TextAreaChatLog[data-colortheme="light2"] .ChatMessageName {
-        text-shadow: 0 0 0.12em rgba(0, 0, 0, .5);
-        }
-        #TextAreaChatLog[data-colortheme="dark2"] .ChatMessageName {
-        text-shadow: 0 0 0.12em rgba(255, 255, 255, .4);
-        }
-        #TextAreaChatLog[data-colortheme="dark2"] .ChatMessage::before,
-        #TextAreaChatLog[data-colortheme="dark2"] .ChatMessage::after,
-        #TextAreaChatLog[data-colortheme="light2"] .ChatMessage::before,
-        #TextAreaChatLog[data-colortheme="light2"] .ChatMessage::after {
-        position: absolute;
-        float: none;
-        line-height: 1;
-        font-size: 0.5em;
-        right: 0.2em;
-        }
-        #TextAreaChatLog[data-colortheme="dark2"] .ChatMessage::before,
-        #TextAreaChatLog[data-colortheme="light2"] .ChatMessage::before {
-        top: 0.4em;
-        }
-        #TextAreaChatLog[data-colortheme="dark2"] .ChatMessage::after,
-        #TextAreaChatLog[data-colortheme="light2"] .ChatMessage::after {
-        top: 1.6em;
-        }
-        #TextAreaChatLog[data-enterleave=smaller] .ChatMessageEnterLeave {
-            font-size: 0.5em;
-            text-align: center;
-        }
-        #TextAreaChatLog[data-shrinknondialogue=true] .ChatMessageNonDialogue {
-            font-size: 0.5em;
-            text-align: center;
-        }
-        #TextAreaChatLog[data-enterleave=hidden] .ChatMessageEnterLeave {
-            display: none;
-        }
-        #TextAreaChatLog[data-membernumbers=never] .ChatMessage::after,
-        #TextAreaChatLog[data-membernumbers=onmouseover] .ChatMessage::after {
-            display: none;
-        }
-        #TextAreaChatLog[data-membernumbers=onmouseover] .ChatMessage:hover::after {
-            display: block;
-        }
-        #TextAreaChatLog[data-displaytimestamps=false] .ChatMessage::before {
-            display: none;
-        }
-        #TextAreaChatLog[data-displaytimestamps=false] .ChatMessage::after {
-            top: 0;
-        }
-        #TextAreaChatLog[data-colornames=false] .ChatMessageName {
-            color: inherit !important;
-            text-shadow: none;
-            font-weight: bold;
-        }
-        #TextAreaChatLog[data-coloractions=false] .ChatMessageAction,
-        #TextAreaChatLog[data-coloremotes=false] .ChatMessageEmote,
-        #TextAreaChatLog[data-coloractivities=false] .ChatMessageActivity {
-            background-color: transparent !important;
-        }
-        #TextAreaChatLog[data-whitespace=preserve] {
-            white-space: pre-wrap;
-            overflow-wrap: break-word;
-        }
-        </style>
-        <title>Chat History</title>
-    </head>
-    <body style="margin: auto;">
-        <div id="TextAreaChatLog" name="TextAreaChatLog" screen-generated="ChatRoom" 
-            class="HideOnPopup" style="font-size: 2vw; font-family: &quot;Arial&quot;, 
-            sans-serif; position: fixed;
-            width: 100vw; height: 100vh; display: inline;" data-coloractions="true" data-coloractivities="true" data-coloremotes="true"
-            data-colornames="true" data-colortheme="dark" data-displaytimestamps="true" data-enterleave="normal" data-fontsize="medium"
-            data-membernumbers="always" data-mustyleposes="false" data-showactivities="true" data-showautomaticmessages="false"
-            data-showbeepchat="true" data-showchathelp="true" data-shrinknondialogue="false" data-whitespace="preserve" data-censoredwordslist=""
-            data-censoredwordslevel="0">"""
+def new_parse_method(chatlog):
+    chatby = new_format_content_distributer(chatlog)
 
-endhtml = """
-    </div>
-</body>
-</html>
-"""
-
-r = lambda: random.randint(0,255)
-
-for file in files:
-    filename, file_extension = os.path.splitext(file)
-    if file_extension != ".html":
-        print("Ignoring",file,"as file extension isn't .html")
-        continue
-    print("Working on: ",file,end="\n\n")
-    chatlog = []
-    with open("input_chat\\" + file,"r") as chathtml:
-        chatlog = chathtml.readline().split("<br>")
-
-    # print(len(chatlog))
-    chatby = []
-    index = -1
-    skipfile = False
-    for doer in chatlog:
-        try:
-            if doer != "" and doer[0] == "[" and doer[-1] == "]":
-                index += 1
-                chatby.append([doer])
-            else:
-                if len(chatby[index]) == 1:
-                    chatby[index].append(doer)
-                else:
-                    chatby[index][1] = chatby[index][1] + " <br> " + doer
-        except:
-            # print(doer,len(doer))
-            print("Error parsing file. This may indicate that the file is in the old EBCH format.\n")
-            skipfile = True
-            break
-            # input("Press Enter to close...")
-            # sys.exit()
-    if skipfile: continue
     print("No of chats: ",len(chatby))
     
     boilerplate = "<div class=\"ChatMessage "
     boilerend = " </div>"
     new_format = ""
 
-    # player_rgbacolor = "255,0,138,0.1"
-    # player_color = "#9d41bc"
-    # player_rgbconv = "{}".format( tuple([int(player_color[i+1:i+3], 16) for i in (0, 2, 4)] + [0.1]))
-
-    char_config = {}
-    if os.path.isfile('char_config.json'):
-        with open('char_config.json', 'r') as fp:
-            char_config = json.load(fp)
-
     current_date = ""
     current_room = ""
 
     for x in tqdm(chatby):
         chat_details = x[0].split(" - ")
-        # print(chat_details)
-        chat_date = chat_details[0][1:]
-        chat_time = chat_details[1]
-        chat_room = chat_details[2].replace("Room: ","")
-        chat_char = chat_details[3].replace("AccName: ","")
-        chat_member_number = chat_details[4].replace("AccNum: ","")[:-1]
-        # print(chat_char,chat_date,chat_member_number,chat_room)
+        (chat_date,chat_time,chat_room,chat_char,chat_member_number) = general_chat_detail_set(chat_details,char_config)
         ischat = False
         iswhisp = False
 
         if current_room != chat_room or current_date != chat_date:
-            new_format += "<div style=\"font-size: 2.5vw; background-color: navy; font-family: cursive; color: ghostwhite; text-align: center;\">" + "<span style=\"color: red\"> Room Name:     </span>" + chat_room + "<span style=\"float: right; font-size: 1.4vw\">" + chat_date +"</span></div>"
+            new_format += roomname_begin + chat_room + roomname_mid + chat_date + roomname_end
             current_room = chat_room
             current_date = chat_date
-
-        if chat_member_number not in char_config:
-            char_config[chat_member_number] = {}
-            char_config[chat_member_number]["player_name"] = chat_char
-            rgbacolor = (r(),r(),r(),0.1)
-            player_rgbacolor = "{}".format(rgbacolor)
-            player_color = "#%02X%02X%02X" % rgbacolor[:-1]
-            char_config[chat_member_number]["player_color"] = player_color
-            char_config[chat_member_number]["player_rgbacolor"] = player_rgbacolor
-
         new_format += boilerplate
 
         if x[1][0] == "(" and x[1][-1] == ")":
@@ -298,7 +66,10 @@ for file in files:
         new_format += "data-time=\"" + chat_time + "\" "
         new_format += "data-sender=\"" + chat_member_number + "\" "
 
-        new_format += "style=\"background-color:rgba" + char_config[chat_member_number]["player_rgbacolor"] + ";\">"
+        if ischat:
+            new_format += ">"
+        else:
+            new_format += "style=\"background-color:rgba" + char_config[chat_member_number]["player_rgbacolor"] + ";\">"
         # new_format += "\n"
 
         if ischat or iswhisp:
@@ -316,19 +87,105 @@ for file in files:
             new_format += x[1]
 
         new_format += boilerend
+    return new_format
 
-        # print(new_format)
-        # break
+def old_format_parser(chathtml,char_config):
+    soup = BSoup(chathtml,"html.parser")
+    for tag in soup.select(".lds-ellipsis"):
+        tag.decompose()
+    for tag in soup.select("div.bce-pending.ChatMessageEmote"):
+        tag.decompose()
+    chatlog = list(soup)
 
-    final_html = beginhtml + new_format + endhtml
+    am_new = []
+    am_len = 0
+    for i in chatlog[::-1]:
+        if isinstance(i,NavigableString) or i.name == "br":
+            # print(i)
+            am_len += 1
+            if isinstance(i,NavigableString):
+                am_new.append(str(i))
+        else:
+            break
+    new_format = ""
+    if len(am_new) > 0:
+        new_format = new_parse_method(am_new[::-1])
+        chatparsed = old_format_content_distributer(chatlog[:-am_len])
+    else:
+        chatparsed = old_format_content_distributer(chatlog)
 
-    if not os.path.isdir("output_chat"):
-        print("Creating output_chat folder...")
-        os.mkdir("output_chat")
-    print("\nSaving converted file in output_chat...")
-    with open("output_chat\\-converted-"+file,"w") as createhtml:
-        createhtml.write(final_html)
-    print("Done!\n")
+    current_date = ""
+    current_room = ""
+    old_format = ""
+    print("No of chats:",len(chatparsed))
+
+    for x in tqdm(chatparsed):
+        # try: 
+        chat_details = x[0].split(" - ")
+        chat_data = x[1]
+
+        (chat_date,chat_time,chat_room,chat_char,chat_member_number) = general_chat_detail_set(chat_details,char_config,chat_data)
+
+        if current_room != chat_room or current_date != chat_date:
+            old_format += roomname_begin + chat_room + roomname_mid + chat_date + roomname_end
+            current_room = chat_room
+            current_date = chat_date
+            continue
+        
+        # if len(x) == 2:
+        old_format += str(chat_data)
+        # except:
+        #     print(x)
+    return old_format + new_format
+
+# r = lambda: random.randint(0,255)
+
+def new_format_parser(chathtml,char_config):
+    chatlog = chathtml.readline().split("<br>")
+
+    new_format = new_parse_method(chatlog)
+    return new_format
+
+old_chathtml = []
+new_chathtml = []
+
+char_config = {}
+if os.path.isfile('char_config.json'):
+    with open('char_config.json', 'r') as fp:
+        char_config = json.load(fp)
+
+for file in files:
+    filename, file_extension = os.path.splitext(file)
+    if file_extension != ".html":
+        print("Ignoring",file,"as file extension isn't .html")
+        continue
+    print("Checking file: ",file)
+
+    with open("input_chat\\" + file,"r") as chathtml:
+        first_tag = chathtml.readline()
+        first_tag = first_tag[first_tag.find("[")+1:first_tag.find("]")]
+        # soup = BSoup(chathtml,"html.parser")
+        # for tag in soup:
+        #     if isinstance(tag,NavigableString):
+        # first_tag = str(tag)
+        if len(first_tag.split(" - ")) == 3:
+            old_chathtml.append(file)
+        elif len(first_tag.split(" - ")) == 5:
+            new_chathtml.append(file)
+        else:
+            print("Format not detected, skipping.. ", file, end="\n\n")
+print("File checks done.",end="\n\n")
+
+for file in old_chathtml:
+    print("Working on: ",file,end="\n\n")
+    with open("input_chat\\" + file,"r") as chathtml:
+        finalhtml = beginhtml + old_format_parser(chathtml,char_config) + endhtml
+        save_html(finalhtml)
+for file in new_chathtml:
+    print("Working on: ",file,end="\n\n")
+    with open("input_chat\\" + file,"r") as chathtml:
+        finalhtml = beginhtml + new_format_parser(chathtml,char_config) + endhtml
+        save_html(finalhtml)
 
 with open('char_config.json', 'w') as fp:
     json.dump(char_config, fp, sort_keys=True, indent=4)
