@@ -1,5 +1,5 @@
 # **PECL**
-## Prettier EBCH Chatlogs by Haruhi #78366 [Download](https://github.com/crimsontropy/PECL/releases/download/Mver/PECL.exe)
+## Prettier EBCH Chatlogs by Haruhi #78366 [Download](https://github.com/crimsontropy/PECL/releases/download/allF/PECL.exe)
 
 A quick and easy way to get some styling on [EBCH chatlogs](https://e2466.gitlab.io/ebch/).
 Thanks to Elicia #10831 for the logger! 
